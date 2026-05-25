@@ -1,0 +1,65 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Boum",
+        "description": "Sign in with your Boum account to expose your controllers in Home Assistant.",
+        "data": {
+          "email": "Email",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate Boum",
+        "description": "Your Boum credentials for {email} are no longer working. Enter the new password to continue.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid email or password.",
+      "cannot_connect": "Couldn't reach the Boum API. Check your internet connection and try again.",
+      "unknown": "Something unexpected went wrong. See the Home Assistant logs for details."
+    },
+    "abort": {
+      "already_configured": "This Boum account is already configured.",
+      "reauth_successful": "Reauthentication was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Boum options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "switch": {
+      "pump": {
+        "name": "Pump"
+      }
+    },
+    "number": {
+      "refill_interval_days": {
+        "name": "Refill interval"
+      },
+      "max_pump_duration_minutes": {
+        "name": "Max pump duration"
+      }
+    },
+    "time": {
+      "refill_time": {
+        "name": "Refill time"
+      }
+    },
+    "sensor": {
+      "firmware_version": {
+        "name": "Firmware"
+      }
+    }
+  }
+}

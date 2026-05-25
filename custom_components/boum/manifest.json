@@ -1,0 +1,17 @@
+{
+  "domain": "boum",
+  "name": "Boum",
+  "version": "0.1.0",
+  "codeowners": ["@mousaka20"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/mousaka20/boum-ha",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/mousaka20/boum-ha/issues",
+  "requirements": [
+    "boum==1.4.0",
+    "python-dateutil>=2.8.2",
+    "regex>=2023.6.3"
+  ]
+}
