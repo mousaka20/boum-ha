@@ -27,6 +27,7 @@ async def async_setup_entry(
     # only appear once the device has reported data for them — so we re-check
     # on every coordinator update.
     created_firmware: set[str] = set()
+    created_owner: set[str] = set()
     created_telemetry: set[tuple[str, str]] = set()
 
     @callback
@@ -36,6 +37,9 @@ async def async_setup_entry(
             if device_id not in created_firmware:
                 created_firmware.add(device_id)
                 new.append(BoumFirmwareSensor(coordinator, device_id))
+            if device_id not in created_owner:
+                created_owner.add(device_id)
+                new.append(BoumOwnerSensor(coordinator, device_id))
 
             snap = coordinator.data.get(device_id) if coordinator.data else None
             if snap is None:
@@ -70,6 +74,49 @@ class BoumFirmwareSensor(BoumEntity, SensorEntity):
         if snap is None or snap.reported_state is None:
             return None
         return snap.reported_state.firmware_version
+
+
+class BoumOwnerSensor(BoumEntity, SensorEntity):
+    """Owner of the device (from ``GET /devices/{id}/owner``).
+
+    Disabled by default — most users only care for diagnostics. The full
+    owner record is exposed as a state attribute so it can still be picked
+    up by templates if needed.
+    """
+
+    _attr_translation_key = "owner"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_entity_registry_enabled_default = False
+    _attr_icon = "mdi:account"
+
+    def __init__(self, coordinator: BoumDataUpdateCoordinator, device_id: str) -> None:
+        super().__init__(coordinator, device_id, "owner")
+
+    @property
+    def native_value(self) -> str | None:
+        snap = self.snapshot
+        if snap is None or snap.owner is None:
+            return None
+        # Prefer email > id > anything stringy.
+        for key in ("email", "id", "userId", "ownerId", "name"):
+            value = snap.owner.get(key)
+            if isinstance(value, str) and value:
+                return value
+        return None
+
+    @property
+    def extra_state_attributes(self) -> dict | None:
+        snap = self.snapshot
+        if snap is None or snap.owner is None:
+            return None
+        # Only surface JSON-friendly scalar fields. Anything else (nested
+        # objects, raw timestamps) is dropped to keep the attribute table
+        # clean.
+        return {
+            k: v
+            for k, v in snap.owner.items()
+            if isinstance(v, (str, int, float, bool))
+        }
 
 
 class BoumTelemetrySensor(BoumEntity, SensorEntity):

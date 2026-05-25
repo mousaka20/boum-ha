@@ -41,6 +41,9 @@
     "switch": {
       "pump": {
         "name": "Pump"
+      },
+      "leakage_detection": {
+        "name": "Leakage detection"
       }
     },
     "number": {
@@ -53,12 +56,15 @@
     },
     "time": {
       "refill_time": {
-        "name": "Refill time"
+        "name": "Refill time (legacy)"
       }
     },
     "sensor": {
       "firmware_version": {
         "name": "Firmware"
+      },
+      "owner": {
+        "name": "Owner"
       }
     }
   }

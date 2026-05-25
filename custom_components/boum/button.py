@@ -12,6 +12,7 @@ from .const import (
     COMMAND_RESTART_DEVICE,
     DIAGNOSTIC_COMMANDS,
     DOMAIN,
+    EXTRA_COMMANDS_SET,
 )
 from .coordinator import BoumDataUpdateCoordinator
 from .entity import BoumEntity
@@ -63,6 +64,15 @@ class BoumCommandButton(BoumEntity, ButtonEntity):
             self._attr_entity_registry_enabled_default = False
 
     async def async_press(self) -> None:
-        await self.coordinator.client.async_send_command(self._device_id, self._command)
+        if self._command in EXTRA_COMMANDS_SET:
+            # Commands not in the SDK's allow-list go through the raw HTTP
+            # client, but functionally produce the same `deviceCommands` PATCH.
+            await self.coordinator.client.async_send_extra_command(
+                self._device_id, self._command
+            )
+        else:
+            await self.coordinator.client.async_send_command(
+                self._device_id, self._command
+            )
         # Don't immediately refresh — many of these commands take time to
         # take effect. The next regular poll will pick up any state changes.

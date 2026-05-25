@@ -23,6 +23,13 @@ DEFAULT_SCAN_INTERVAL: Final = 60  # seconds
 MIN_SCAN_INTERVAL: Final = 30
 MAX_SCAN_INTERVAL: Final = 3600
 
+# Refill slots — Boum exposes three independent daily slots in the API
+# (`dailyRefill`/`refillTimeOne`, `dailyRefillTwo`/`refillTimeTwo`,
+# `dailyRefillThree`/`refillTimeThree`). We expose one switch + one time per
+# slot. Slot 1 is the "primary" slot and is enabled by default in the UI.
+REFILL_SLOTS: Final = (1, 2, 3)
+REFILL_SLOT_DEFAULT_ENABLED: Final = (1,)
+
 # How far back we look for telemetry on each poll. The Boum controller reports
 # at low frequency, so an hour gives us a comfortable buffer to always have a
 # "latest" value to display.
@@ -40,6 +47,9 @@ COMMAND_US_INCR_STRENGTH: Final = "distUsIncrStrength"
 COMMAND_US_DECR_STRENGTH: Final = "distUsDecrStrength"
 COMMAND_US_READ_STRENGTH: Final = "distUsReadStrength"
 COMMAND_US_CLEAN_LOOP: Final = "distUsCleanLoop"
+# CLI-only command — rejected by the SDK's client-side allow-list, sent via
+# the raw API path in `extra_api.py`.
+COMMAND_RESET_LAST_PUMPED: Final = "resetLastPumped"
 
 # Human-readable labels for the buttons we expose.
 COMMAND_LABELS: Final[dict[str, str]] = {
@@ -50,7 +60,22 @@ COMMAND_LABELS: Final[dict[str, str]] = {
     COMMAND_US_DECR_STRENGTH: "Decrease ultrasonic strength",
     COMMAND_RESET_WIFI: "Reset WiFi credentials",
     COMMAND_UPDATE_CERTIFICATE: "Update certificate",
+    COMMAND_RESET_LAST_PUMPED: "Reset last-pumped counter",
 }
+
+# Commands routed through the SDK (it accepts these in its allow-list).
+SDK_COMMANDS: Final[set[str]] = {
+    COMMAND_RESTART_DEVICE,
+    COMMAND_US_CLEAN_LOOP,
+    COMMAND_US_READ_STRENGTH,
+    COMMAND_US_INCR_STRENGTH,
+    COMMAND_US_DECR_STRENGTH,
+    COMMAND_RESET_WIFI,
+    COMMAND_UPDATE_CERTIFICATE,
+}
+
+# Commands the SDK rejects client-side; routed through the raw extra-API.
+EXTRA_COMMANDS_SET: Final[set[str]] = {COMMAND_RESET_LAST_PUMPED}
 
 # Buttons that are potentially disruptive get hidden in the diagnostic category
 # but are still available to power users.
@@ -60,6 +85,7 @@ DIAGNOSTIC_COMMANDS: Final[set[str]] = {
     COMMAND_US_INCR_STRENGTH,
     COMMAND_US_DECR_STRENGTH,
     COMMAND_US_READ_STRENGTH,
+    COMMAND_RESET_LAST_PUMPED,
 }
 
 # --- Flag → binary_sensor mapping -------------------------------------------
